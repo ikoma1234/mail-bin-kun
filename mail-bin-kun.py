@@ -10,8 +10,6 @@ from tkinter import ttk
 
 from os.path import expanduser
 
-home = expanduser("~")
-
 app = tk.Tk()
 app.resizable(True, True)
 
@@ -74,7 +72,7 @@ def chooseFile():
 def chooseFolder():
     global savefolderName
     savefolderName = tkinter.filedialog.askdirectory(
-        title="保存先フォルダを選択", mustexist=True, initialdir=home)
+        title="保存先フォルダを選択", mustexist=True, initialdir=os.getcwd())
 
     savefolderName = savefolderName + os.sep
     folderDone = tk.Label(frame_3, text=savefolderName)
@@ -125,8 +123,29 @@ def item2frame(item_image, bg, site="Rakuten"):
 
     frame.paste(scaled_im1, (FRAME_X+x, FRAME_Y+y))
 
-    frame.show()
+    # frame.show()
     return frame
+
+
+def save_img(img, type="", quantity=1):
+    img.load()  # required for png.split()
+
+    bg = Image.new("RGB", img.size, (255, 255, 255))
+    bg.paste(img, mask=img.split()[3])  # 3 is the alpha channel
+
+    save_path = ""
+
+    if type != "" and quantity > 1:
+        save_path = savefolderName + janTxt.get() + "-" + str(quantity) + \
+            "set-" + type + ".jpg"
+    elif type != "":
+        save_path = savefolderName + janTxt.get() + "-" + type + ".jpg"
+    elif type == "" and quantity > 1:
+        save_path = savefolderName + janTxt.get() + "-" + str(quantity) + "set.jpg"
+    else:
+        save_path = savefolderName + janTxt.get() + ".jpg"
+
+    bg.save(save_path, "JPEG", quality=95)
 
 
 def makeImage():
@@ -136,6 +155,15 @@ def makeImage():
     if janTxt.get() == "":
         tkinter.messagebox.showerror(title="Error", message="JANコードを入力してください。")
         return
+
+    # check shipping method
+    if (normalVal.get() == True and mailVal.get() == True) or (normalVal.get() == False and mailVal.get() == False):
+        tkinter.messagebox.showerror(
+            title="Error", message="配送方法は一つだけチェックしてください。")
+        return
+
+    # TODO: [error check] check if the destination folder was selected or not. if not selected show an error message.
+    # check destination folder
 
     basewidth = 300
 
@@ -160,18 +188,15 @@ def makeImage():
                     im_freeshipping = Image.open(
                         "./images/rakuten/freeshipping.png")
                     # 個数取得、対応画像を名前で取得
-                    # im_freeshipping.show()
                     im_kosuu = Image.open(
                         "./images/rakuten/mail" + str(x) + "set.png")
 
-                    im_freeshipping.paste(im_kosuu, (0, 0), im_kosuu)
-                    frame.paste(im_freeshipping, (0, 0), im_freeshipping)
-
                     final_img_1 = item2frame(cropped_im1, frame)
 
-                    final_img_1 = final_img_1.convert("RGB")
-                    final_img_1.save(
-                        savefolderName + janTxt.get() + "-" + str(x) + "set-" + typeCombo.get() + ".jpg")
+                    im_freeshipping.paste(im_kosuu, (0, 0), im_kosuu)
+                    final_img_1.paste(im_freeshipping, (0, 0), im_freeshipping)
+
+                    save_img(final_img_1, typeCombo.get(), x)
 
                 else:
                     frame = bg.copy()
@@ -179,41 +204,42 @@ def makeImage():
                     # メール便だったら自動で送料無料
                     im_freeshipping = Image.open(
                         "./images/rakuten/freeshipping.png")
-                    im_mail.paste(im_freeshipping, (0, 0), im_freeshipping)
-
-                    frame.paste(im_mail, (0, 0), im_mail)
 
                     final_img_2 = item2frame(cropped_im1, frame)
 
-                    final_img_2 = final_img_2.convert("RGB")
-                    final_img_2.save(
-                        savefolderName + janTxt.get() + "-" + typeCombo.get() + ".jpg")
+                    im_mail.paste(im_freeshipping, (0, 0), im_freeshipping)
+
+                    final_img_2.paste(im_mail, (0, 0), im_mail)
+
+                    save_img(final_img_2, typeCombo.get())
 
         elif (normalVal.get() == True):
             frame = bg.copy()
             for x in quantity:
-                if int(x) != 1:
-                    im_kosuu = Image.open("./images/rakuten/"+x+".png")
-                    frame.paste(im_kosuu, (0, 0), im_kosuu)
+                if int(x) != 1 and freeshippingVal.get() != True:
+                    im_kosuu = Image.open("./images/rakuten/"+str(x)+".png")
+                    im_kosuu.show()
                     final_img_3 = item2frame(cropped_im1, frame)
-                    final_img_3 = final_img_3.convert("RGB")
-                    final_img_3.save(savefolderName +
-                                     janTxt.get() + "-" + str(x) + "set.jpg")
+                    final_img_3.paste(im_kosuu, (0, 0), im_kosuu)
+                    save_img(final_img_3, typeCombo.get(), x)
 
-                if (freeshippingVal.get() == True):
+                elif int(x) != 1 and freeshippingVal.get() == True:
                     im_freeshipping = Image.open(
                         "./images/rakuten/freeshipping.png")
-                    frame.paste(im_freeshipping, (0, 0), im_kosuu)
-                    final_img_3 = item2frame(cropped_im1, frame)
+                    im_kosuu = Image.open("./images/rakuten/"+str(x)+".png")
 
-                    final_img_3 = final_img_3.convert("RGB")
-                    final_img_3.save(savefolderName +
-                                     janTxt.get() + "-" + str(x) + "set.jpg")
+                    final_img_3 = item2frame(cropped_im1, frame)
+                    final_img_3.paste(im_freeshipping, (0, 0), im_freeshipping)
+                    final_img_3.paste(im_kosuu, (0, 0), im_kosuu)
+
+                    save_img(final_img_3, typeCombo.get(), x)
+
                 else:
                     final_img_3 = item2frame(cropped_im1, frame)
-                    final_img_3 = final_img_3.convert("RGB")
-                    final_img_3.save(savefolderName + janTxt.get() + ".jpg")
 
+                    save_img(final_img_3, typeCombo.get(), x)
+
+# TODO: implement yahoo method like rakuten, create images
     elif(siteCombo.get() == "Yahoo"):
         im2 = Image.open("Yahoo/Yahoo_format.png")
         if(haisouCombo.get() == "送料無料"):
@@ -279,7 +305,7 @@ typeCombo.grid(row=5, column=1, padx=10, pady=10, sticky=tk.W)
 
 def activateTypebox():
     if mailVal.get() == True:
-        typeCombo.config(state=tk.READONLY)
+        typeCombo.config(state="readonly")
     else:
         typeCombo.config(state=tk.DISABLED)
 
@@ -288,7 +314,8 @@ chkMail = ttk.Checkbutton(frame_1, text=u"メール便",
                           variable=mailVal, command=activateTypebox)
 chkMail.grid(column=1, row=4, padx=10, pady=10, sticky=tk.W + tk.E)
 
-chkNormal = ttk.Checkbutton(frame_1, text=u"普通便", variable=normalVal)
+chkNormal = ttk.Checkbutton(
+    frame_1, text=u"普通便", variable=normalVal, command=activateTypebox)
 chkNormal.grid(column=2, row=4, padx=10, pady=10, sticky=tk.W + tk.E)
 
 
@@ -330,31 +357,6 @@ janLabel.grid(column=0, row=0, padx=10, pady=10)
 
 janTxt = tk.Entry(frame_4, width=30)
 janTxt.grid(column=1, row=0, padx=10, pady=10)
-
-
-# chkHaisou = tk.Checkbutton()
-# haisouCombo = ttk.Combobox(state="readonly", values=["メール便", "普通便"])
-# haisouCombo.place(x=150, y=170-5)
-
-# freeshippingLabel = ttk.Label(text="送料")
-# freeshippingLabel.place(x=10, y=220-5)
-
-# freeshippingCombo = ttk.Combobox(state="readonly", values=["送料無料", "送料別"])
-# freeshippingCombo.place(x=150, y=220 - 5)
-
-# kosuuLabel = tk.Label(text="個数(1~10)")
-# kosuuLabel.place(x=10, y=270-5)
-
-# testList = [1, 2, 3, 5, 10]
-
-# kosuuCombo = ttk.Combobox(state="readonly", values=testList)
-# kosuuCombo.place(x=150, y=270-5)
-
-# siteLabel = tk.Label(text="サイト選択")
-# siteLabel.place(x=10, y=320-5)
-
-# siteCombo = ttk.Combobox(state="readonly", values=["楽天", "Yahoo"])
-# siteCombo.place(x=150, y=320-5)
 
 createButton = tk.Button(text="  画像生成  ", font=(
     "Helvetica", 15), command=makeImage)
