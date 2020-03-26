@@ -238,7 +238,6 @@ def makeImage():
 
                     save_img(final_img_3, typeCombo.get(), x)
 
-# TODO: implement yahoo method like rakuten, create images
     elif(yahooVal.get() == True):
         if (mailVal.get() == True):
             for x in quantity:
