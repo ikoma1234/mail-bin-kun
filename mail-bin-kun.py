@@ -183,7 +183,7 @@ def makeImage():
     if(rakutenVal.get() == True):
         if (mailVal.get() == True):
             for x in quantity:
-                if (int(x) != 1):
+                if (x != 1):
                     frame = bg.copy()
                     im_freeshipping = Image.open(
                         "./images/rakuten/freeshipping.png")
@@ -216,14 +216,13 @@ def makeImage():
         elif (normalVal.get() == True):
             frame = bg.copy()
             for x in quantity:
-                if int(x) != 1 and freeshippingVal.get() != True:
+                if x != 1 and freeshippingVal.get() != True:
                     im_kosuu = Image.open("./images/rakuten/"+str(x)+".png")
-                    im_kosuu.show()
                     final_img_3 = item2frame(cropped_im1, frame)
                     final_img_3.paste(im_kosuu, (0, 0), im_kosuu)
                     save_img(final_img_3, typeCombo.get(), x)
 
-                elif int(x) != 1 and freeshippingVal.get() == True:
+                elif x != 1 and freeshippingVal.get() == True:
                     im_freeshipping = Image.open(
                         "./images/rakuten/freeshipping.png")
                     im_kosuu = Image.open("./images/rakuten/"+str(x)+".png")
@@ -240,11 +239,58 @@ def makeImage():
                     save_img(final_img_3, typeCombo.get(), x)
 
 # TODO: implement yahoo method like rakuten, create images
-    elif(siteCombo.get() == "Yahoo"):
-        im2 = Image.open("Yahoo/Yahoo_format.png")
-        if(haisouCombo.get() == "送料無料"):
-            im3 = Image.open("Yahoo/Yahoo_freeshippingandmail.png")
-            im2.paste(im3, (0, 0), im3)
+    elif(yahooVal.get() == True):
+        if (mailVal.get() == True):
+            for x in quantity:
+                if (x != 1):
+                    frame = bg.copy()
+                    im_freeshipping = Image.open(
+                        "./images/yahoo/mail.png")
+                    # 個数取得、対応画像を名前で取得
+                    im_kosuu = Image.open(
+                        "./images/yahoo/" + str(x) + "set.png")
+
+                    final_img_1 = item2frame(cropped_im1, frame, "Yahoo")
+
+                    im_freeshipping.paste(im_kosuu, (0, 0), im_kosuu)
+                    final_img_1.paste(im_freeshipping, (0, 0), im_freeshipping)
+
+                    save_img(final_img_1, typeCombo.get(), x)
+
+                else:
+                    frame = bg.copy()
+                    im_mail = Image.open("./images/yahoo/mail.png")
+
+                    final_img_2 = item2frame(cropped_im1, frame, "Yahoo")
+
+                    final_img_2.paste(im_mail, (0, 0), im_mail)
+
+                    save_img(final_img_2, typeCombo.get())
+
+        elif (normalVal.get() == True):
+            frame = Image.open("./images/yahoo/normal.png")
+            for x in quantity:
+                if x != 1 and freeshippingVal.get() != True:
+                    im_kosuu = Image.open("./images/yahoo/"+str(x)+".png")
+                    final_img_3 = item2frame(cropped_im1, frame)
+                    final_img_3.paste(im_kosuu, (0, 0), im_kosuu)
+                    save_img(final_img_3, typeCombo.get(), x)
+
+                elif x != 1 and freeshippingVal.get() == True:
+                    im_freeshipping = Image.open(
+                        "./images/yahoo/freeshipping.png")
+                    im_kosuu = Image.open("./images/yahoo/"+str(x)+".png")
+
+                    final_img_3 = item2frame(cropped_im1, frame)
+                    final_img_3.paste(im_freeshipping, (0, 0), im_freeshipping)
+                    final_img_3.paste(im_kosuu, (0, 0), im_kosuu)
+
+                    save_img(final_img_3, typeCombo.get(), x)
+
+                else:
+                    final_img_3 = item2frame(cropped_im1, frame)
+
+                    save_img(final_img_3, typeCombo.get(), x)
 
 
 titleLabel = tk.Label(text="メール便君", font=("Helvetica", 20))
