@@ -162,9 +162,23 @@ def makeImage():
             title="Error", message="配送方法は一つだけチェックしてください。")
         return
 
-    # TODO: [error check] check if the destination folder was selected or not. if not selected show an error message.
-    # check destination folder
+    # check file
 
+    if fileName == "":
+        tkinter.messagebox.showerror(title="Error", message="ファイルを選択してください。")
+        return
+
+    #check folder
+
+    if savefolderName == "":
+        tkinter.messagebox.showerror(title="Error", message="保存先フォルダを選択してください。")
+        return
+
+    #check site
+
+    if rakutenVal.get() == False and yahooVal.get() == False:
+        tkinter.messagebox.showerror(title="Error", message="サイト名を選択してください。")
+        return
     basewidth = 300
 
     im1 = Image.open(fileName).convert("RGBA")
