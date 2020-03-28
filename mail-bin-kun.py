@@ -6,16 +6,14 @@ import numpy as np
 import os
 
 from PIL import Image, ImageChops
-from tkinter import ttk
-
+from tkinter import ttk, DISABLED
 from os.path import expanduser
 
 app = tk.Tk()
 app.resizable(True, True)
 
 app.title("メール便君")
-app.geometry('600x600')
-
+app.geometry('540x580')
 
 fYtp = [("", "*.png")]
 
@@ -102,7 +100,7 @@ def item2frame(item_image, bg, site="Rakuten"):
         FRAME_WIDTH = YAHOO_FRAME_WIDTH
         FRAME_HEIGHT = YAHOO_FRAME_HEIGHT
     frame = bg.copy()
-# get image width and height
+    # get image width and height
     im_width, im_height = item_image.size
 
     # print(im_width, im_height)
@@ -149,9 +147,7 @@ def save_img(img, type="", quantity=1):
 
 
 def makeImage():
-
     # check jan
-
     if janTxt.get() == "":
         tkinter.messagebox.showerror(title="Error", message="JANコードを入力してください。")
         return
@@ -162,20 +158,23 @@ def makeImage():
             title="Error", message="配送方法は一つだけチェックしてください。")
         return
 
-    # check file
+    # check site
+    if(rakutenVal.get() == True and yahooVal.get() == True):
+        tkinter.messagebox.showerror(
+            title="Error", message="サイトは一つだけ選択してください。")
+        return
 
+    # check file
     if fileName == "":
         tkinter.messagebox.showerror(title="Error", message="ファイルを選択してください。")
         return
 
     #check folder
-
     if savefolderName == "":
         tkinter.messagebox.showerror(title="Error", message="保存先フォルダを選択してください。")
         return
 
     #check site
-
     if rakutenVal.get() == False and yahooVal.get() == False:
         tkinter.messagebox.showerror(title="Error", message="サイト名を選択してください。")
         return
@@ -400,14 +399,24 @@ Check_buttn_number = 10
 
 for i in range(Check_buttn_number):
     Check_val = tk.BooleanVar()
-    Check_val.set(True)
+    Check_val.set(False)
     if(i < 5):
-        Check_buttn = tk.Checkbutton(frame_2, text=str(
+        if(i==3):   
+            Check_buttn = tk.Checkbutton(frame_2, text=str(
+            len(Check_list) + 1), variable=Check_val, state=DISABLED) #画像用意でき次第DISABLED消す
+        else:    
+            Check_buttn = tk.Checkbutton(frame_2, text=str(
             len(Check_list) + 1), variable=Check_val)
+        
     else:
-        Check_val.set(False)
-        Check_buttn = tk.Checkbutton(frame_2, text=str(
+        if(i!=9):
+            Check_buttn = tk.Checkbutton(frame_2, text=str(
+            len(Check_list) + 1), variable=Check_val, state=DISABLED) #画像用意でき次第DISABLED消す
+        else:
+            Check_val.set
+            Check_buttn = tk.Checkbutton(frame_2, text=str(
             len(Check_list) + 1), variable=Check_val)
+    
     Check_buttn.grid(column=i+1, row=5, padx=5, pady=10, sticky=tk.W)
     Check_list.append(Check_buttn)
     Check_list_val.append(Check_val)
