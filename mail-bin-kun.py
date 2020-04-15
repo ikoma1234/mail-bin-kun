@@ -179,6 +179,10 @@ def makeImage():
         tkinter.messagebox.showerror(title="Error", message="サイト名を選択してください。")
         return
 
+    if len(Check_list_val)==0:
+        tkinter.messagebox.showerror(title="Error", message="個数を選択してください。")
+        return
+
     basewidth = 300
 
     im1 = Image.open(fileName).convert("RGBA")
@@ -210,7 +214,7 @@ def makeImage():
                     im_freeshipping.paste(im_kosuu, (0, 0), im_kosuu)
                     final_img_1.paste(im_freeshipping, (0, 0), im_freeshipping)
 
-                    save_img(final_img_1, typeCombo.get(), x)
+                    save_img(final_img_1, "mail", x)
 
                 else:
                     frame = bg.copy()
@@ -225,7 +229,7 @@ def makeImage():
 
                     final_img_2.paste(im_mail, (0, 0), im_mail)
 
-                    save_img(final_img_2, typeCombo.get())
+                    save_img(final_img_2, "mail")
 
         elif (normalVal.get() == True):
             frame = bg.copy()
@@ -234,7 +238,7 @@ def makeImage():
                     im_kosuu = Image.open("./images/rakuten/"+str(x)+".png")
                     final_img_3 = item2frame(cropped_im1, frame)
                     final_img_3.paste(im_kosuu, (0, 0), im_kosuu)
-                    save_img(final_img_3, typeCombo.get(), x)
+                    save_img(final_img_3, "", x)
 
                 elif x != 1 and freeshippingVal.get() == True:
                     im_freeshipping = Image.open(
@@ -245,12 +249,12 @@ def makeImage():
                     final_img_3.paste(im_freeshipping, (0, 0), im_freeshipping)
                     final_img_3.paste(im_kosuu, (0, 0), im_kosuu)
 
-                    save_img(final_img_3, typeCombo.get(), x)
+                    save_img(final_img_3, "", x)
 
                 else:
                     final_img_3 = item2frame(cropped_im1, frame)
 
-                    save_img(final_img_3, typeCombo.get(), x)
+                    save_img(final_img_3, "", x)
 
     elif(yahooVal.get() == True):
         if (mailVal.get() == True):
@@ -268,7 +272,7 @@ def makeImage():
                     im_freeshipping.paste(im_kosuu, (0, 0), im_kosuu)
                     final_img_1.paste(im_freeshipping, (0, 0), im_freeshipping)
 
-                    save_img(final_img_1, typeCombo.get(), x)
+                    save_img(final_img_1, "mail-yahoo", x)
 
                 else:
                     frame = bg.copy()
@@ -278,32 +282,46 @@ def makeImage():
 
                     final_img_2.paste(im_mail, (0, 0), im_mail)
 
-                    save_img(final_img_2, typeCombo.get())
+                    save_img(final_img_2, "mail-yahoo")
 
         elif (normalVal.get() == True):
             frame = Image.open("./images/yahoo/normal.png")
-            for x in quantity:
-                if x != 1 and freeshippingVal.get() != True:
-                    im_kosuu = Image.open("./images/yahoo/"+str(x)+".png")
-                    final_img_3 = item2frame(cropped_im1, frame)
-                    final_img_3.paste(im_kosuu, (0, 0), im_kosuu)
-                    save_img(final_img_3, typeCombo.get(), x)
-
-                elif x != 1 and freeshippingVal.get() == True:
-                    im_freeshipping = Image.open(
+            im_freeshipping = Image.open(
                         "./images/yahoo/freeshipping.png")
-                    im_kosuu = Image.open("./images/yahoo/"+str(x)+".png")
 
-                    final_img_3 = item2frame(cropped_im1, frame)
-                    final_img_3.paste(im_freeshipping, (0, 0), im_freeshipping)
-                    final_img_3.paste(im_kosuu, (0, 0), im_kosuu)
+            for x in quantity:
+                if x != 1:
+                    frame = bg.copy()
+                    im_normal = Image.open(
+                        "./images/yahoo/normal.png")
+                    # 個数取得、対応画像を名前で取得
+                    im_kosuu = Image.open(
+                        "./images/yahoo/" + str(x) + "set.png")
 
-                    save_img(final_img_3, typeCombo.get(), x)
+                    final_img_3 = item2frame(cropped_im1, frame, "Yahoo")        
+                    
+                    if freeshippingVal.get() == True:
+                        im_freeshipping.paste(im_kosuu, (0, 0), im_kosuu)
+                        final_img_3.paste(im_freeshipping, (0, 0), im_freeshipping)
 
+                        save_img(final_img_3, "yahoo", x)
+                    else:
+                        im_normal.paste(im_kosuu, (0, 0), im_kosuu)
+                        final_img_3.paste(im_normal, (0, 0), im_normal)
+
+                        save_img(final_img_3, "yahoo", x)
                 else:
-                    final_img_3 = item2frame(cropped_im1, frame)
+                    frame = bg.copy()
+                    im_mail = Image.open("./images/yahoo/normal.png")
 
-                    save_img(final_img_3, typeCombo.get(), x)
+                    final_img_2 = item2frame(cropped_im1, frame, "Yahoo")
+                    final_img_2.paste(im_mail, (0, 0), im_mail)
+
+                    if freeshippingVal.get() == True:
+                        final_img_2.paste(im_freeshipping, (0, 0), im_freeshipping)
+
+                    save_img(final_img_2, "yahoo")
+
 
 
 titleLabel = tk.Label(text="メール便君", font=("Helvetica", 20))
@@ -321,14 +339,8 @@ frame_4.grid(row=4, column=0, sticky=tk.W + tk.E, padx=20)
 fileButton = tk.Button(frame_3, text="ファイル選択", command=chooseFile)
 fileButton.grid(column=0, row=1, padx=10, pady=10, sticky=tk.E)
 
-filesYet = tk.Label(frame_3, text="*ファイルが未選択です*")
-filesYet.grid(column=0, row=0, padx=50, pady=10, sticky=tk.W)
-
 folderButton = tk.Button(frame_3, text="保存先フォルダ選択", command=chooseFolder)
 folderButton.grid(column=0, row=3, padx=10, pady=10, sticky=tk.E)
-
-folderYet = tk.Label(frame_3, text="*保存先フォルダが未選択です*")
-folderYet.grid(column=0, row=2, padx=50, pady=10, sticky=tk.W)
 
 siteLabel = tk.Label(frame_1, text="サイト名")
 siteLabel.grid(column=0, row=3, padx=10, pady=10, sticky=tk.W)
@@ -338,7 +350,7 @@ rakutenVal = tk.BooleanVar()
 yahooVal = tk.BooleanVar()
 
 rakutenVal.set(True)
-yahooVal.set(True)
+yahooVal.set(False)
 
 chkRakuten = ttk.Checkbutton(frame_1, text=u"Rakuten", variable=rakutenVal)
 chkRakuten.grid(column=1, row=3, padx=10, pady=10, sticky=tk.W + tk.E)
@@ -355,26 +367,14 @@ normalVal = tk.BooleanVar()
 mailVal.set(True)
 normalVal.set(False)
 
-typeLabel = tk.Label(frame_1, text="メール便種類")
-typeCombo = ttk.Combobox(frame_1, state="readonly", values=[
-    "tkg", "kkn", "ypt", "nko"], width=10)
-typeLabel.grid(row=5, column=0, padx=10, pady=10, sticky=tk.W + tk.E)
-typeCombo.grid(row=5, column=1, padx=10, pady=10, sticky=tk.W)
-
-
-def activateTypebox():
-    if mailVal.get() == True:
-        typeCombo.config(state="readonly")
-    else:
-        typeCombo.config(state=tk.DISABLED)
-
+typeCombo = "mail"
 
 chkMail = ttk.Checkbutton(frame_1, text=u"メール便",
-                          variable=mailVal, command=activateTypebox)
+                          variable=mailVal)
 chkMail.grid(column=1, row=4, padx=10, pady=10, sticky=tk.W + tk.E)
 
 chkNormal = ttk.Checkbutton(
-    frame_1, text=u"普通便", variable=normalVal, command=activateTypebox)
+    frame_1, text=u"普通便", variable=normalVal)
 chkNormal.grid(column=2, row=4, padx=10, pady=10, sticky=tk.W + tk.E)
 
 
